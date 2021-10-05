@@ -2,17 +2,22 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("WhitelistSignature", function () {
-  it("should allow minting for whitelisted wallets", async function () {
-    const prefix = "AIFA Whitelist Verification:";
-    const prefixHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(prefix));
+  const prefix = "AIFA Whitelist Verification:";
+  const prefixHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(prefix));
 
-    const wallets = await ethers.getSigners();
+  let wallets;
+  let contract;
+
+  beforeEach("setup contract for each test", async function () {
+    wallets = await ethers.getSigners();
+    const factory = await ethers.getContractFactory("WhitelistSignature");
+    contract = await factory.deploy(prefix);
+    await contract.deployed();
+  });
+
+  it("should allow minting for whitelisted wallets", async function () {
     // popup the owner wallet from other whitelist wallets
     const owner = wallets.shift();
-
-    const factory = await ethers.getContractFactory("WhitelistSignature");
-    const contract = await factory.deploy(prefix);
-    await contract.deployed();
 
     // verify initial mint status
     expect(await contract.n()).to.equal(0);
@@ -37,14 +42,6 @@ describe("WhitelistSignature", function () {
   });
 
   it("should raise an error if the caller wallet was not whitelisted", async function () {
-    const prefix = "AIFA Whitelist Verification:";
-    const prefixHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(prefix));
-
-    const factory = await ethers.getContractFactory("WhitelistSignature");
-    const contract = await factory.deploy(prefix);
-    await contract.deployed();
-
-    const wallets = await ethers.getSigners();
     // use the second wallet which is not whitelisted
     const wallet = wallets[1];
 
