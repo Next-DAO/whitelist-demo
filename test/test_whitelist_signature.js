@@ -9,10 +9,11 @@ describe("WhitelistSignature", function () {
   let contract;
 
   beforeEach("setup contract for each test", async function () {
-    wallets = await ethers.getSigners();
     const factory = await ethers.getContractFactory("WhitelistSignature");
     contract = await factory.deploy(prefix);
     await contract.deployed();
+
+    wallets = await ethers.getSigners();
   });
 
   it("should allow minting for whitelisted wallets", async function () {
