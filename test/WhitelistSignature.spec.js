@@ -43,8 +43,8 @@ describe("WhitelistSignature", function () {
   });
 
   it("should raise an error if the caller wallet was not whitelisted", async function () {
-    // use the second wallet which is not whitelisted
-    const wallet = wallets[1];
+    // use a random wallet which is not whitelisted
+    const wallet = ethers.Wallet.createRandom().connect(wallets[0].provider);
 
     // generate hash based on prefix + contract address + non-whitelist wallet address
     const hash = ethers.utils.keccak256(
