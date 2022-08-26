@@ -4,12 +4,15 @@ const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
 
 describe("WhitelistMerkleProof", function () {
-  let wallets;
   let contract;
   let tree;
+  let owner;
+  let wallets;
 
   beforeEach("setup contract for each test", async function () {
     wallets = await ethers.getSigners();
+    // remove the owner wallet from whitelist
+    owner = wallets.shift();
 
     // build Merkle Tree with whitelist addresses as leaves
     const leaves = wallets.map((w) => keccak256(w.address));
@@ -38,8 +41,8 @@ describe("WhitelistMerkleProof", function () {
   });
 
   it("should raise an error if the caller wallet was not whitelisted", async function () {
-    // use a random wallet which is not whitelisted
-    const wallet = ethers.Wallet.createRandom().connect(wallets[0].provider);
+    // use the owner wallet which is not whitelisted
+    const wallet = owner;
 
     const proof = tree.getHexProof(keccak256(wallet.address));
 
